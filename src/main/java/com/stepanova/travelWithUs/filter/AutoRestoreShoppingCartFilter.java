@@ -1,0 +1,61 @@
+package com.stepanova.travelWithUs.filter;
+
+import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.stepanova.travelWithUs.model.ShoppingCart;
+import com.stepanova.travelWithUs.util.SessionUtils;
+
+@WebFilter(filterName="AutoRestoreShoppingCartFilter")
+public class AutoRestoreShoppingCartFilter extends AbstractFilter {
+	private static final String SHOPPING_CARD_DESERIALIZATION_DONE = "SHOPPING_CARD_DESERIALIZATION_DONE";
+
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+	}
+
+	@Override
+	public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpServletResponse resp = (HttpServletResponse) response;
+		if (req.getSession().getAttribute(SHOPPING_CARD_DESERIALIZATION_DONE) == null) {
+			if (!SessionUtils.isCurrentShoppingCartCreated(req)) {
+				Cookie cookie = SessionUtils.findShoppingCartCookie(req);
+				if (cookie != null) {
+					ShoppingCart shoppingCart = shoppingCartFromString(cookie.getValue());
+					SessionUtils.setCurrentShoppingCart(req, shoppingCart);
+				}
+			}
+			req.getSession().setAttribute(SHOPPING_CARD_DESERIALIZATION_DONE, Boolean.TRUE);
+		}
+
+		chain.doFilter(req, resp);
+	}
+
+	protected ShoppingCart shoppingCartFromString(String cookieValue) {
+		ShoppingCart shoppingCart = new ShoppingCart();
+		String[] items = cookieValue.split("\\|");
+		for (String item : items) {
+			String data[] = item.split("-");
+			try {
+				int idTour = Integer.parseInt(data[0]);
+				int count = Integer.parseInt(data[1]);
+				shoppingCart.addTour(idTour, count);
+			} catch (RuntimeException e) {
+				e.printStackTrace();
+			}
+		}
+		return shoppingCart;
+	}
+
+	@Override
+	public void destroy() {
+	}
+}

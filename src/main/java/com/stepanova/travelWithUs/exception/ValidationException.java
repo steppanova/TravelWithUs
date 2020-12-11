@@ -1,10 +1,12 @@
 package com.stepanova.travelWithUs.exception;
 
-public class ValidationException extends IllegalArgumentException {
+import javax.servlet.http.HttpServletResponse;
 
-	private static final long serialVersionUID = -7185393923997687128L;
+public class ValidationException extends AbstractApplicationException {
+	
+	private static final long serialVersionUID = 7938953764482318278L;
 
 	public ValidationException(String s) {
-		super(s);
+		super(s, HttpServletResponse.SC_BAD_REQUEST);
 	}
 }

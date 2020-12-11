@@ -4,16 +4,49 @@
 		$('#addToCart').click(addTourToCart);
 		$('#addTourPopup .count').change(calculateCost);
 		$('#loadMore').click(loadMoreTours);
+		$('#loadMoreMyOrders').click(loadMoreMyOrders);
 		initSearchForm();
 		$('#goSearch').click(goSearch);
 		$('.remove-tour').click(removeTourFromCart);
+		$('.post-request').click(function(){
+			postRequest($(this).attr('data-url'));
+		});
 	};
-
+	var convertButtonToLoader = function (btn, btnClass) {
+		btn.removeClass(btnClass);
+		btn.removeClass('btn');
+		btn.addClass('load-indicator');
+		var text = btn.text();
+		btn.text('');
+		btn.attr('data-btn-text', text);
+		btn.off('click');
+	};
+	var convertLoaderToButton = function (btn, btnClass, actionClick) {
+		btn.removeClass('load-indicator');
+		btn.addClass('btn');
+		btn.addClass(btnClass);
+		btn.text(btn.attr('data-btn-text'));
+		btn.removeAttr('data-btn-text');
+		btn.click(actionClick);
+	};
+	var postRequest = function(url){
+		var form = '<form id="postRequestForm" action="'+url+'" method="post"></form>';
+		$('body').append(form);
+		$('#postRequestForm').submit();
+	};
+	var confirm = function (msg, okFunction) {
+		if(window.confirm(msg)) {
+			okFunction();
+		}
+	};
+	var alert = function (msg) {
+		window.alert(msg);
+	};
 	var showAddTourPopup = function (){
 		var idTour = $(this).attr('data-id-tour');
 		var tour = $('#tour'+idTour);
 		$('#addTourPopup').attr('data-id-tour', idTour);
-		$('#addTourPopup .tour-image').attr('src', tour.find('.card img').attr('src'));
+		$('#addTourPopup .tour-image').attr('src', tour.find('.thumbnail img').attr('src'));
 		$('#addTourPopup .name').text(tour.find('.name').text());
 		var price = tour.find('.price').text();
 		$('#addTourPopup .price').text(price);
@@ -33,18 +66,31 @@
 	var addTourToCart = function (){
 		var idTour = $('#addTourPopup').attr('data-id-tour');
 		var count = $('#addTourPopup .count').val();
-		$('#addToCart').addClass('hidden');
-		$('#addToCartIndicator').removeClass('hidden');
-		setTimeout(function(){
-			var data = {
-				totalCount : count,
-				totalCost : 2000
-			};
-			$('#currentShoppingCart .total-count').text(data.totalCount);
-			$('#currentShoppingCart .total-cost').text(data.totalCost);
-			$('#currentShoppingCart').removeClass('hidden');
-			$('#addTourPopup').modal('hide');
-		}, 800);
+		var btn = $('#addToCart');
+		convertButtonToLoader(btn, 'btn-primary');
+		$.ajax({
+			url : '/ajax/json/tour/add',
+			method : 'POST',
+			data : {
+				idTour : idTour,
+				count : count
+			},
+			success : function(data) {
+				$('#currentShoppingCart .total-count').text(data.totalCount);
+				$('#currentShoppingCart .total-cost').text(data.totalCost);
+				$('#currentShoppingCart').removeClass('hidden');
+				convertLoaderToButton(btn, 'btn-primary', addTourToCart);
+				$('#addTourPopup').modal('hide');
+			},
+			error : function(xhr) {
+				convertLoaderToButton(btn, 'btn-primary', addTourToCart);
+				if (xhr.status == 400) {
+					alert(xhr.responseJSON.message);
+				} else {
+					alert('Error');
+				}
+			}
+		});
 	};
 	var calculateCost = function(){
 		var priceStr = $('#addTourPopup .price').text();
@@ -61,24 +107,7 @@
 		}
 	};
 	
-	var convertButtonToLoader = function (btn, btnClass) {
-		btn.removeClass(btnClass);
-		btn.removeClass('btn');
-		btn.addClass('load-indicator');
-		var text = btn.text();
-		btn.text('');
-		btn.attr('data-btn-text', text);
-		btn.off('click');
-	};
-	var convertLoaderToButton = function (btn, btnClass, actionClick) {
-		btn.removeClass('load-indicator');
-		btn.addClass('btn');
-		btn.addClass(btnClass);
-		btn.text(btn.attr('data-btn-text'));
-		btn.removeAttr('data-btn-text');
-		btn.click(actionClick);
-	};
-	var loadMoreTours =function (){
+		var loadMoreTours =function (){
 		var btn = $('#loadMore');
 		convertButtonToLoader(btn, 'btn-primary');
 		var pageNumber = parseInt($('#tourList').attr('data-page-number'));
@@ -95,10 +124,39 @@
 				}else{
 					btn.remove();
 				}
+				initBuyBtn();
 			},
 			error : function(data) {
 				convertLoaderToButton(btn, 'btn-primary', loadMoreTours);
 				alert('Error');
+			}
+		});
+	};
+	var loadMoreMyOrders = function (){
+		var btn = $('#loadMoreMyOrders');
+		convertButtonToLoader(btn, 'btn-success');
+		var pageNumber = parseInt($('#myOrders').attr('data-page-number'));
+		var url = '/ajax/html/more/my-orders?page=' + (pageNumber + 1);
+		$.ajax({
+			url : url,
+			success : function(html) {
+				$('#myOrders tbody').append(html);
+				pageNumber++;
+				var pageCount = parseInt($('#myOrders').attr('data-page-count'));
+				$('#myOrders').attr('data-page-number', pageNumber);
+				if (pageNumber < pageCount) {
+					convertLoaderToButton(btn, 'btn-success', loadMoreMyOrders);
+				} else {
+					btn.remove();
+				}
+			},
+			error : function(xhr) {
+				convertLoaderToButton(btn, 'btn-success', loadMoreMyOrders);
+				if (xhr.status == 401) {
+					window.location.href = '/sign-in';
+				} else {
+					alert('Error');
+				}
 			}
 		});
 	};
@@ -134,11 +192,6 @@
 		}
 		$('form.search').submit();
 	};
-	var confirm = function (msg, okFunction) {
-		if(window.confirm(msg)) {
-			okFunction();
-		}
-	};
 	var removeTourFromCart = function (){
 		var btn = $(this);
 		confirm('Are you sure?', function(){
@@ -158,45 +211,37 @@
 	var executeRemoveTour = function (btn) {
 		var idTour = btn.attr('data-id-tour');
 		var count = btn.attr('data-count');
-		btn.removeClass('btn-primary');
-		btn.removeClass('btn');
-		btn.addClass('load-indicator');
-		var text = btn.text();
-		btn.text('');
-		btn.off('click');
-
-		setTimeout(function(){
-			var data = {
-				totalCount : 1,
-				totalCost : 1
-			};
-			if(data.totalCount === 0) {
-				window.location.href = 'tours.html';
-			} else {
-				var prevCount = parseInt($('#tour'+idTour+' .count').text());
-				var remCount = parseInt(count);
-				if(remCount === prevCount) {
-					$('#tour'+idTour).remove();
-
-					//
-					if($('#shoppingCart .item').length === 0) {
-						window.location.href = 'tours.html';
-					}
-					//
+		convertButtonToLoader(btn, 'btn-danger');
+		$.ajax({
+			url : '/ajax/json/tour/remove',
+			method : 'POST',
+			data : {
+				idTour : idTour,
+				count : count
+			},
+			success : function(data) {
+				if (data.totalCount == 0) {
+					window.location.href = '/tours';
 				} else {
-					btn.removeClass('load-indicator');
-					btn.addClass('btn-primary');
-					btn.addClass('btn');
-					btn.text(text);
-					btn.click(removeTourFromCart);
-					$('#tour'+idTour+' .count').text(prevCount - remCount);
-					if(prevCount - remCount == 1) {
-						$('#tour'+idTour+' a.remove-tour.all').remove();
+					var prevCount = parseInt($('#tour' + idTour + ' .count').text());
+					var remCount = parseInt(count);
+					if (remCount >= prevCount) {
+						$('#tour' + idTour).remove();
+					} else {
+						convertLoaderToButton(btn, 'btn-danger', removeTourFromCart);
+						$('#tour' + idTour + ' .count').text(prevCount - remCount);
+						if(prevCount - remCount == 1) {
+							$('#tour' + idTour + ' a.remove-all').remove();
+						}
 					}
+					refreshTotalCost();
 				}
-				refreshTotalCost();
+			},
+			error : function(data) {
+				convertLoaderToButton(btn, 'btn-danger', removeTourFromCart);
+				alert('Error');
 			}
-		}, 1000);
+		});
 	}
 
 	init();

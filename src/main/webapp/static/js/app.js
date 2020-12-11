@@ -60,15 +60,45 @@
 			$('#addTourPopup .cost').text(priceStr);
 		}
 	};
-	var loadMoreTours = function (){
-		$('#loadMore').addClass('hidden');
-		$('#loadMoreIndicator').removeClass('hidden');
+	
+	var convertButtonToLoader = function (btn, btnClass) {
+		btn.removeClass(btnClass);
+		btn.removeClass('btn');
+		btn.addClass('load-indicator');
+		var text = btn.text();
+		btn.text('');
+		btn.attr('data-btn-text', text);
+		btn.off('click');
+	};
+	var convertLoaderToButton = function (btn, btnClass, actionClick) {
+		btn.removeClass('load-indicator');
+		btn.addClass('btn');
+		btn.addClass(btnClass);
+		btn.text(btn.attr('data-btn-text'));
+		btn.removeAttr('data-btn-text');
+		btn.click(actionClick);
+	};
+	var loadMoreTours =function (){
+		var btn = $('#loadMore');
+		convertButtonToLoader(btn, 'btn-primary');
+		var pageNumber = parseInt($('#tourList').attr('data-page-number'));
+		var url = '/ajax/html/more' + location.pathname + '?page='+(pageNumber + 1) + '&' + location.search.substring(1);
 		$.ajax({
-			url : '/ajax/html/more/tours',
-			primary : function (html){
-				$('#tourList .text-center').prepend(html);
-				$('#loadMoreIndicator').addClass('hidden');
-				$('#loadMore').removeClass('hidden');
+			url : url,
+			success : function(html) {
+				$('#tourList .row').append(html);
+				pageNumber = pageNumber +1;
+				var pageCount = parseInt($('#tourList').attr('data-page-count'));
+				$('#tourList').attr('data-page-count', pageNumber);
+				if(pageNumber < pageCount){
+					convertLoaderToButton(btn, 'btn-primary', loadMoreTours);
+				}else{
+					btn.remove();
+				}
+			},
+			error : function(data) {
+				convertLoaderToButton(btn, 'btn-primary', loadMoreTours);
+				alert('Error');
 			}
 		});
 	};

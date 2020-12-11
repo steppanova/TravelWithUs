@@ -4,18 +4,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="/static/css/bootstrap.css">
-<link rel="stylesheet" href="/static/css/app.css">
-<link rel="shortcut icon" href="static/img/icon.ico" type="image/x-icon" />
-<title>TravelWithUs</title>
-<link href="/static/css/bootstrap.css" rel="stylesheet">
-<link href="/static/css/bootstrap-theme.css" rel="stylesheet">
-<link href="/static/css/font-awesome.css" rel="stylesheet">
-<link href="/static/css/app.css" rel="stylesheet">
+ <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TravelWithUs</title>
+  <link href="/static/css/bootstrap.css" rel="stylesheet">
+  <link href="/static/css/bootstrap-theme.css" rel="stylesheet">
+  <link href="/static/css/font-awesome.css" rel="stylesheet">
+  <link href="/static/css/app.css" rel="stylesheet">
 </head>
 <body>
 	<header>

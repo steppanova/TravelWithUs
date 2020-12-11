@@ -5,6 +5,7 @@ import javax.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.stepanova.travelWithUs.Constants;
 import com.stepanova.travelWithUs.service.impl.ServiceManager;
 
 public class TravelWithUsApplicationListener implements ServletContextListener {
@@ -15,6 +16,8 @@ public class TravelWithUsApplicationListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			serviceManager = ServiceManager.getInstance(sce.getServletContext());
+			sce.getServletContext().setAttribute(Constants.COUNTRY_LIST, serviceManager.getTourService().listAllCountries());
+			sce.getServletContext().setAttribute(Constants.CITY_LIST, serviceManager.getTourService().listAllCities());
 		} catch (RuntimeException e) {
 			LOGGER.error("Web application 'travelWithUs' init failed: " + e.getMessage(), e);
 			throw e;

@@ -9,33 +9,37 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.stepanova.travelWithUs.form.TourForm;
 import com.stepanova.travelWithUs.model.ShoppingCart;
+import com.stepanova.travelWithUs.service.OrdersService;
+import com.stepanova.travelWithUs.service.impl.ServiceManager;
 import com.stepanova.travelWithUs.util.SessionUtils;
 
 @WebFilter(filterName="AutoRestoreShoppingCartFilter")
 public class AutoRestoreShoppingCartFilter extends AbstractFilter {
+	
 	private static final String SHOPPING_CARD_DESERIALIZATION_DONE = "SHOPPING_CARD_DESERIALIZATION_DONE";
 
+	private OrdersService ordersService;
+	
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+		ordersService = ServiceManager.getInstance(filterConfig.getServletContext()).getOrdersService();
 	}
-
+	
 	@Override
-	public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		HttpServletRequest req = (HttpServletRequest) request;
-		HttpServletResponse resp = (HttpServletResponse) response;
-		if (req.getSession().getAttribute(SHOPPING_CARD_DESERIALIZATION_DONE) == null) {
-			if (!SessionUtils.isCurrentShoppingCartCreated(req)) {
+	public void doFilter(HttpServletRequest req, HttpServletResponse resp, FilterChain chain) throws IOException, ServletException {
+		if(req.getSession().getAttribute(SHOPPING_CARD_DESERIALIZATION_DONE) == null){
+			if(!SessionUtils.isCurrentShoppingCartCreated(req)) {
 				Cookie cookie = SessionUtils.findShoppingCartCookie(req);
-				if (cookie != null) {
+				if(cookie != null) {
 					ShoppingCart shoppingCart = shoppingCartFromString(cookie.getValue());
 					SessionUtils.setCurrentShoppingCart(req, shoppingCart);
 				}
 			}
 			req.getSession().setAttribute(SHOPPING_CARD_DESERIALIZATION_DONE, Boolean.TRUE);
 		}
-
+		
 		chain.doFilter(req, resp);
 	}
 
@@ -47,15 +51,28 @@ public class AutoRestoreShoppingCartFilter extends AbstractFilter {
 			try {
 				int idTour = Integer.parseInt(data[0]);
 				int count = Integer.parseInt(data[1]);
-				shoppingCart.addTour(idTour, count);
+				ordersService.addTourToShoppingCart(new TourForm(idTour, count), shoppingCart);
 			} catch (RuntimeException e) {
 				e.printStackTrace();
 			}
 		}
 		return shoppingCart;
 	}
-
-	@Override
-	public void destroy() {
-	}
+	
+	/*protected String shoppingCartToString(ShoppingCart shoppingCart) {
+		StringBuilder res = new StringBuilder();
+		for (ShoppingCartItem shoppingCartItem : shoppingCart.getItems()) {
+			res.append(shoppingCartItem.getIdProduct()).append("-").append(shoppingCartItem.getCount()).append("|");
+		}
+		if (res.length() > 0) {
+			res.deleteCharAt(res.length() - 1);
+		}
+		return res.toString();
+	}*/
+	
+	/*
+ShoppingCart shoppingCart = SessionUtils.getCurrentShoppingCart(req);
+			String cookieValue = shoppingCartToString(shoppingCart);
+			SessionUtils.updateCurrentShoppingCartCookie(cookieValue, resp);
+	 */
 }

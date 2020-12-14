@@ -9,8 +9,7 @@
 <jsp:include page="../fragment/tour-list.jsp" />
 </div>
     <c:if test="${pageCount > 1 }">
-	<div class="text-center hidden-print">
-	<img id="loadMoreIndicator" src="/static/img/loading.gif" class="hidden" alt="Loading..."> 
+	<div class="text-center hidden-print"> 
 	<a id="loadMore" class="btn btn-primary">Load more tours</a>
 	</div>
 	</c:if>

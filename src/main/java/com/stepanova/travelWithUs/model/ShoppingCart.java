@@ -3,7 +3,7 @@ package com.stepanova.travelWithUs.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import com.stepanova.travelWithUs.Constants;
 import com.stepanova.travelWithUs.entity.Tour;
@@ -12,7 +12,7 @@ import com.stepanova.travelWithUs.exception.ValidationException;
 public class ShoppingCart implements Serializable {
 	
 	private static final long serialVersionUID = -7182154007024202473L;
-	private Map<Integer, ShoppingCartItem> tours = new HashMap<>();
+	private Map<Integer, ShoppingCartItem> tours = new LinkedHashMap<>();
 	private int totalCount = 0;
 	private BigDecimal totalCost = BigDecimal.ZERO;
 
@@ -80,5 +80,6 @@ public class ShoppingCart implements Serializable {
 	public String toString() {
 		return String.format("ShoppingCart [tours=%s, totalCount=%s, totalCost=%s]", tours, totalCount, totalCost);
 	}
+
 
 }

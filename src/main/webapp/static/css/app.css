@@ -3,7 +3,7 @@
 	font-style: italic;
 	padding-bottom: 6px;
 	border-bottom: 1px solid #ddd;
-	caret-color: #000000;
+
 	
 }
 
@@ -89,13 +89,13 @@
 }
 .small {
 	position: relative;
-	min-height: 5px;
-	max-height: 5px;
+	min-height: 10px;
+	max-height: 20px;
 }	
 
 @media (min-width: 1600px) {
 	.small{
-		max-width: 5px;
+		max-width: 20px;
 	}	
 	.col-xlg-2 {
 		float: left;

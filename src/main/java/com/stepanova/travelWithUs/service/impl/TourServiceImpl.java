@@ -50,7 +50,7 @@ class TourServiceImpl implements TourService {
 		try (Connection c = dataSource.getConnection()) {
 			int offset = (page - 1) * limit;
 			return JDBCUtils.select(c,
-					"select t.*, c.name as country, ci.name as city from tour t, country c, city ci where c.url=? and ci.id=t.id_city and c.id=p.id_country order by t.id limit ? offset ?",
+					"select t.*, c.name as country, ci.name as city from tour t, country c, city ci where c.url=? and ci.id=t.id_city and c.id=t.id_country order by t.id limit ? offset ?",
 					toursResultSetHandler, countryUrl, limit, offset);
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
@@ -87,17 +87,17 @@ class TourServiceImpl implements TourService {
 	@Override
 	public int countToursByCountry(String countryUrl) {
 		try (Connection c = dataSource.getConnection()) {
-			return JDBCUtils.select(c, "select count(*) from tour t, country c where c.id=t.id_contry and c.url=? ", countResultSetHandler, countryUrl);
+			return JDBCUtils.select(c, "select count(t.*) from tour t, country c where c.id=t.id_country and c.url=?", countResultSetHandler, countryUrl);
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public List<Tour> listToursBySearchForm(SearchForm searchForm, int page, int limit) {
+	public List<Tour> listToursBySearchForm(SearchForm form, int page, int limit) {
 		try (Connection c = dataSource.getConnection()) {
 			int offset = (page - 1) * limit;
-			SearchQuery sq = buildSearchQuery(" *, c.name as country, ci.name as city", searchForm);
+			SearchQuery sq = buildSearchQuery(" t.*, c.name as country, ci.name as city", form);
 			sq.getSql().append(" order by t.id limit ? offset ?");
 			sq.getParams().add(limit);
 			sq.getParams().add(offset);
@@ -109,34 +109,24 @@ class TourServiceImpl implements TourService {
 	}
 
 	@Override
-	public int countToursBySearchForm(SearchForm searchForm) {
+	public int countToursBySearchForm(SearchForm form) {
 		try (Connection c = dataSource.getConnection()) {
-			return JDBCUtils.select(c, "select count(*) from tour t, city ci, country c "
-					+ "where (t.name ilike ? or t.description ilike ?) and c.id=t.id_country and ci.id=t.id_city", 
-					countResultSetHandler, "%"+searchForm.getQuery()+"%", "%"+searchForm.getQuery()+"%");
+			SearchQuery sq = buildSearchQuery("count(*)", form);
+			LOGGER.debug("search query={} with params={}", sq.getSql(), sq.getParams());
+			return JDBCUtils.select(c, sq.getSql().toString(), countResultSetHandler, sq.getParams().toArray());
 		} catch (SQLException e) {
-			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
+			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
 		}
 	}
 	protected SearchQuery buildSearchQuery(String selectFields, SearchForm form) {
 		List<Object> params = new ArrayList<>();
 		StringBuilder sql = new StringBuilder("select ");
-		sql.append(selectFields).append(" from tour t, country c, city ci where ci.id=t.id_city and c.id=t.id_country and (t.name like ? or t.duration like ?)");
+		sql.append(selectFields).append(" from tour t, country c, city ci where ci.id=t.id_city and c.id=t.id_country and (t.name like ? or t.description like ?)");
 		params.add("%" + form.getQuery() + "%");
 		params.add("%" + form.getQuery() + "%");
 		JDBCUtils.populateSqlAndParams(sql, params, form.getCountries(), "c.id = ?");
 		JDBCUtils.populateSqlAndParams(sql, params, form.getCities(), "ci.id = ?");
 		return new SearchQuery(sql, params);
-	}
-	@Override
-	public List<Tour> listToursByPrice(String countryUrl, int page, int limit) {
-		try (Connection c = dataSource.getConnection()) {
-			int offset = (page - 1) * limit;
-			return JDBCUtils.select(c,
-					"select * from tour  where id=? order by price limit ? offset ?", toursResultSetHandler, countryUrl, limit, offset);
-		} catch (SQLException e) {
-			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
-		}
 	}
 
 }

@@ -2,13 +2,22 @@ package com.stepanova.travelWithUs.service.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 
 import com.stepanova.travelWithUs.entity.Account;
+import com.stepanova.travelWithUs.entity.Orders;
+import com.stepanova.travelWithUs.entity.OrdersItem;
 import com.stepanova.travelWithUs.entity.Tour;
+import com.stepanova.travelWithUs.exception.AccessDeniedException;
 import com.stepanova.travelWithUs.exception.InternalServerErrorException;
+import com.stepanova.travelWithUs.exception.ResourceNotFoundException;
 import com.stepanova.travelWithUs.form.TourForm;
 import com.stepanova.travelWithUs.jdbc.JDBCUtils;
 import com.stepanova.travelWithUs.jdbc.ResultSetHandler;
@@ -26,6 +35,15 @@ public class OrdersServiceImpl implements OrdersService {
 	private static final ResultSetHandler<Account> accountResultSetHandler = 
 			ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.ACCOUNT_RESULT_SET_HANDLER);
 	private final DataSource dataSource;
+	private final ResultSetHandler<Orders> ordersResultSetHandler = 
+			ResultSetHandlerFactory.getSingleResultSetHandler(ResultSetHandlerFactory.ORDERS_RESULT_SET_HANDLER);
+	private final ResultSetHandler<List<OrdersItem>> ordersItemListResultSetHandler = 
+			ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.ORDERS_ITEM_RESULT_SET_HANDLER);
+	private final ResultSetHandler<List<Orders>> orderssResultSetHandler = 
+			ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.ORDERS_RESULT_SET_HANDLER);
+	private final ResultSetHandler<Integer> countResultSetHandler = 
+			ResultSetHandlerFactory.getCountResultSetHandler();
+
 	
 	public OrdersServiceImpl(DataSource dataSource) {
 		super();
@@ -89,6 +107,70 @@ public class OrdersServiceImpl implements OrdersService {
 				c.commit();
 			}
 			return account;
+		} catch (SQLException e) {
+			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public long makeOrder(ShoppingCart shoppingCart, CurrentAccount currentAccount) {
+		if (shoppingCart == null || shoppingCart.getItems().isEmpty()) {
+			throw new InternalServerErrorException("shoppingCart is null or empty");
+		}
+		try (Connection c = dataSource.getConnection()) {
+			Orders order = JDBCUtils.insert(c, "INSERT INTO orders(id_account,created) values(?,?,?)", ordersResultSetHandler, 
+					currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
+			JDBCUtils.insertBatch(c, "insert into orders_item (id_orders,id_tour,count) values(?,?,?,?)", 
+					toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
+			c.commit();
+			return order.getId();
+		} catch (SQLException e) {
+			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+		}
+	}
+	private List<Object[]> toOrderItemParameterList(long idOrders, Collection<ShoppingCartItem> items) {
+		List<Object[]> parametersList = new ArrayList<>();
+		for (ShoppingCartItem item : items) {
+			parametersList.add(new Object[] { idOrders, item.getTour().getId(), item.getCount() });
+		}
+		return parametersList;
+	}
+	@Override
+	public Orders findOrderById(long id, CurrentAccount currentAccount) {
+		try (Connection c = dataSource.getConnection()) {
+			Orders order = JDBCUtils.select(c, "select * from orders where id=?", ordersResultSetHandler, id);
+			if (order == null) {
+				throw new ResourceNotFoundException("Order not found by id: " + id);
+			}
+			if (!order.getIdAccount().equals(currentAccount.getId())) {
+				throw new AccessDeniedException("Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
+			}
+			List<OrdersItem> list = JDBCUtils.select(c,
+					"select o.id as id, o.id_orders as id_orders, o.id_tour, o.count, t.*, c.name as country, ci.name as city from orders_item o, tour t, country c, city ci "
+							+ "where ci.id=t.id_city and c.id=t.id_country and o.id_tour=t.id and o.id_orders=?",
+					ordersItemListResultSetHandler, id);
+			order.setItems(list);
+			return order;
+		} catch (SQLException e) {
+			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public List<Orders> listMyOrders(CurrentAccount currentAccount, int page, int limit) {
+		int offset = (page - 1) * limit;
+		try (Connection c = dataSource.getConnection()) {
+			List<Orders> orders = JDBCUtils.select(c, "select * from orders where id_account=? order by id desc limit ? offset ?", orderssResultSetHandler, currentAccount.getId(), limit, offset);
+			return orders;
+		} catch (SQLException e) {
+			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public int countMyOrders(CurrentAccount currentAccount) {
+		try (Connection c = dataSource.getConnection()) {
+			return JDBCUtils.select(c, "select count(*) from orders where id_account=?", countResultSetHandler, currentAccount.getId());
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
 		}

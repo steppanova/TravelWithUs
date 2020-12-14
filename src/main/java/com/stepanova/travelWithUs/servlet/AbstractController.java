@@ -21,10 +21,11 @@ public abstract class AbstractController extends HttpServlet {
 	private TourService tourService;
 	private OrdersService ordersService;
 	private SocialService socialService;
+
 	@Override
 	public final void init() throws ServletException {
 		tourService = ServiceManager.getInstance(getServletContext()).getTourService();
-		ordersService = ServiceManager.getInstance(getServletContext()).getOrdersService();
+		ordersService =  ServiceManager.getInstance(getServletContext()).getOrdersService();
 		socialService = ServiceManager.getInstance(getServletContext()).getSocialService();
 	}
 
@@ -35,9 +36,11 @@ public abstract class AbstractController extends HttpServlet {
 	public final OrdersService getOrdersService() {
 		return ordersService;
 	}
+	
 	public final SocialService getSocialService() {
 		return socialService;
 	}
+	
 	public final int getPageCount(int totalCount, int itemsPerPage) {
 		int res = totalCount / itemsPerPage;
 		if(res * itemsPerPage != totalCount) {

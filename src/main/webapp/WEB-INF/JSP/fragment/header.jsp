@@ -1,10 +1,11 @@
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="travelWithUs" tagdir="/WEB-INF/tags" %>
 
 <nav class="navbar navbar-default">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="travelWithUs" aria-expanded="false">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#travelWithUsNav" aria-expanded="false">
 				<span class="sr-only">Toggle navigation</span> 
 				<span class="icon-bar"></span> 
 				<span class="icon-bar"></span> 
@@ -12,7 +13,7 @@
 			</button>
 			<a class="navbar-brand" href="/tours">TravelWithUs</a>
 		</div>
-		<div class="collapse navbar-collapse" id="travelWithUs">
+		<div class="collapse navbar-collapse" id="travelWithUsNav">
 			<ul id="currentShoppingCart" class="nav navbar-nav navbar-right ${CURRENT_SHOPPING_CART == null ? 'hidden' : '' }">
 				<li class="dropdown">
 					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -30,16 +31,12 @@
 					<ul class="nav navbar-nav navbar-right">
 						<li><a>Welcome ${CURRENT_ACCOUNT.description }</a></li>
 						<li><a href="/my-orders">My orders</a></li>
-						<li><a href="/sign-out">Sign out</a></li>
+						<li><a href="javascript:void(0);" class="post-request" data-url="/sign-out">Sign out</a></li>
 					</ul>
 				</c:when>
-				<c:otherwise>
-					<form action="/sign-in" method="post">
-						<button type="submit" class="btn btn-primary navbar-btn navbar-right sign-in">
-							<i class="fa fa-facebook-official" aria-hidden="true"></i> Sign in
-						</button>
-					</form>
-				</c:otherwise>
+				<c:when test="${CURRENT_REQUEST_URL != '/sign-in' and CURRENT_REQUEST_URL != '/shopping-cart' }">
+					<travelWithUs:sign-in classes="navbar-btn navbar-right sign-in" />
+				</c:when>
 			</c:choose>
 		</div>
 	</div>

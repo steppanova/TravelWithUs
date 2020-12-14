@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <div class="alert alert-info">
-  <p>Found <strong>${tourCount }</strong> tours</p>
+	<p>Found <strong>${tourCount }</strong> tours</p>
 </div>
 
 <jsp:include page="tours.jsp" />

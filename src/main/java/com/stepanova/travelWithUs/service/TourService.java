@@ -17,5 +17,4 @@ public interface TourService {
 	List<Tour> listToursBySearchForm(SearchForm searchForm, int page, int limit);
 	int countToursBySearchForm(SearchForm searchForm);
 	List<Tour> listToursByCountry(String countryUrl, int page, int limit);
-	List<Tour> listToursByPrice(String countryUrl, int page, int limit);
 }

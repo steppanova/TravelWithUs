@@ -1,6 +1,7 @@
 package com.stepanova.travelWithUs.form;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SearchForm {
@@ -16,9 +17,9 @@ public class SearchForm {
 	}
 	private List<Integer> convert(String[] args) {
 		if(args == null) {
-			return null;
+			return Collections.emptyList();
 		} else {
-			List<Integer> res = new ArrayList<>();
+			List<Integer> res = new ArrayList<>(args.length);
 			for(String arg : args) {
 				res.add(Integer.parseInt(arg));
 			}
@@ -43,10 +44,10 @@ public class SearchForm {
 	public void setCities(List<Integer> cities) {
 		this.cities = cities;
 	}
-	public boolean isCountriesEmpty(){
-		return countries.isEmpty();
+	public boolean isCountriesNotEmpty(){
+		return !countries.isEmpty();
 	}
-	public boolean isCitiesEmpty(){
-		return cities.isEmpty();
+	public boolean isCitiesNotEmpty(){
+		return !cities.isEmpty();
 	}
 }

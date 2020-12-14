@@ -9,7 +9,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.stepanova.travelWithUs.form.TourForm;
 import com.stepanova.travelWithUs.model.ShoppingCart;
 import com.stepanova.travelWithUs.service.OrdersService;
 import com.stepanova.travelWithUs.service.impl.ServiceManager;
@@ -34,12 +33,13 @@ public class AutoRestoreShoppingCartFilter extends AbstractFilter {
 				Cookie cookie = SessionUtils.findShoppingCartCookie(req);
 				if(cookie != null) {
 					ShoppingCart shoppingCart = ordersService.deserializeShoppingCart(cookie.getValue());
-					SessionUtils.setCurrentShoppingCart(req, shoppingCart);
+					if(shoppingCart != null) {
+						SessionUtils.setCurrentShoppingCart(req, shoppingCart);
+					}
 				}
 			}
 			req.getSession().setAttribute(SHOPPING_CARD_DESERIALIZATION_DONE, Boolean.TRUE);
 		}
-		
 		chain.doFilter(req, resp);
 	}
 

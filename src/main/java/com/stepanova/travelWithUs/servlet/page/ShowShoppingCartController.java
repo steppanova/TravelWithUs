@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.stepanova.travelWithUs.servlet.AbstractController;
 import com.stepanova.travelWithUs.util.RoutingUtils;
+import com.stepanova.travelWithUs.util.SessionUtils;
 
 @WebServlet("/shopping-cart")
 public class ShowShoppingCartController extends AbstractController {
@@ -17,6 +18,10 @@ public class ShowShoppingCartController extends AbstractController {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		RoutingUtils.forwardToPage("shopping-cart.jsp", req, resp);
+		if (SessionUtils.isCurrentShoppingCartCreated(req)) {
+			RoutingUtils.forwardToPage("shopping-cart.jsp", req, resp);
+		} else {
+			RoutingUtils.redirect("/tours", req, resp);
+		}
 	}
 }

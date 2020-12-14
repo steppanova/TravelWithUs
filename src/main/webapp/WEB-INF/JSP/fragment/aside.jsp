@@ -23,7 +23,7 @@
 			</div>
 		</div>
 		<div id="searchOptions" class="collapse">
-			<div id="searchOptions" class="collapse ${!searchForm.countriesEmpty or !searchForm.citiesEmpty ? 'in' : '' }">
+			<div id="searchOptions" class="collapse ${searchForm.countriesNotEmpty or searchForm.citiesNotEmpty ? 'in' : '' }">
 			<travelWithUs:country-filter countries="${COUNTRY_LIST }" searchForm="${searchForm}" />
 			<travelWithUs:city-filter cities="${CITY_LIST }"  searchForm="${searchForm}" />
 		</div>
@@ -32,7 +32,7 @@
 </form>
 <%-- /Search form --%>
 <%-- Country --%>
-<div id="#tourCatalog" class="panel panel-success collapse">
+<div id="tourCatalog" class="panel panel-success collapse">
 	<div class="panel-heading">Tour catalog</div>
 	<div class="list-group">
 		<c:forEach var="country" items="${COUNTRY_LIST }">

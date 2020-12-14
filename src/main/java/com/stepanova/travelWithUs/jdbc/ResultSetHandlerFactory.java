@@ -8,6 +8,8 @@ import java.util.List;
 import com.stepanova.travelWithUs.entity.Account;
 import com.stepanova.travelWithUs.entity.City;
 import com.stepanova.travelWithUs.entity.Country;
+import com.stepanova.travelWithUs.entity.Orders;
+import com.stepanova.travelWithUs.entity.OrdersItem;
 import com.stepanova.travelWithUs.entity.Tour;
 
 public final class ResultSetHandlerFactory {
@@ -63,7 +65,30 @@ public final class ResultSetHandlerFactory {
 			return a;
 		}
 	};
-	public final static ResultSetHandler<Integer> getCountResultSetHandler() {
+	public static ResultSetHandler<OrdersItem> ORDERS_ITEM_RESULT_SET_HANDLER = new ResultSetHandler<OrdersItem>() {
+		@Override
+		public OrdersItem handle(ResultSet rs) throws SQLException {
+			OrdersItem ordersItem = new OrdersItem();
+			ordersItem.setId(rs.getLong("id"));
+			ordersItem.setCount(rs.getInt("count"));
+			ordersItem.setIdOrders(rs.getLong("id_orders"));
+			Tour t = TOUR_RESULT_SET_HANDLER.handle(rs);
+			ordersItem.setTour(t);
+			return ordersItem;
+		}
+	};
+
+	public static ResultSetHandler<Orders> ORDERS_RESULT_SET_HANDLER = new ResultSetHandler<Orders>() {
+		@Override
+		public Orders handle(ResultSet rs) throws SQLException {
+			Orders o = new Orders();
+			o.setId(rs.getLong("id"));
+			o.setCreated(rs.getTimestamp("created"));
+			o.setIdAccount(rs.getInt("id_account"));
+			return o;
+		}
+	};
+	public static ResultSetHandler<Integer> getCountResultSetHandler() {
 		return new ResultSetHandler<Integer>() {
 			@Override
 			public Integer handle(ResultSet rs) throws SQLException {
@@ -75,8 +100,8 @@ public final class ResultSetHandlerFactory {
 			}
 		};
 	}
-	
-	public final static <T> ResultSetHandler<T> getSingleResultSetHandler(final ResultSetHandler<T> oneRowResultSetHandler) {
+
+	public static <T> ResultSetHandler<T> getSingleResultSetHandler(final ResultSetHandler<T> oneRowResultSetHandler) {
 		return new ResultSetHandler<T>() {
 			@Override
 			public T handle(ResultSet rs) throws SQLException {
@@ -89,7 +114,7 @@ public final class ResultSetHandlerFactory {
 		};
 	}
 
-	public final static <T> ResultSetHandler<List<T>> getListResultSetHandler(final ResultSetHandler<T> oneRowResultSetHandler) {
+	public static <T> ResultSetHandler<List<T>> getListResultSetHandler(final ResultSetHandler<T> oneRowResultSetHandler) {
 		return new ResultSetHandler<List<T>>() {
 			@Override
 			public List<T> handle(ResultSet rs) throws SQLException {

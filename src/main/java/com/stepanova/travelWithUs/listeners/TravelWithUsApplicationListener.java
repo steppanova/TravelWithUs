@@ -19,10 +19,10 @@ public class TravelWithUsApplicationListener implements ServletContextListener {
 			sce.getServletContext().setAttribute(Constants.COUNTRY_LIST, serviceManager.getTourService().listAllCountries());
 			sce.getServletContext().setAttribute(Constants.CITY_LIST, serviceManager.getTourService().listAllCities());
 		} catch (RuntimeException e) {
-			LOGGER.error("Web application 'travelWithUs' init failed: " + e.getMessage(), e);
+			LOGGER.error("Web application 'ishop' init failed: "+e.getMessage(), e);
 			throw e;
 		}
-		LOGGER.info("Web application 'travelWithUs' initialized");
+		LOGGER.info("Web application 'ishop' initialized");
 	}
 
 	@Override

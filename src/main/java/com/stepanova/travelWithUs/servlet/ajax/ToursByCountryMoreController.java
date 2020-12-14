@@ -22,7 +22,7 @@ public class ToursByCountryMoreController extends AbstractController {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String countryUrl = req.getRequestURI().substring(SUBSTRING_INDEX);
-		List<Tour> tours = getTourService().listToursByCountry(countryUrl, 2, Constants.MAX_TOURS_PER_HTML_PAGE);
+		List<Tour> tours = getTourService().listToursByCountry(countryUrl, getPage(req), Constants.MAX_TOURS_PER_HTML_PAGE);
 		req.setAttribute("tours", tours);
 		RoutingUtils.forwardToFragment("tour-list.jsp", req, resp);
 	}

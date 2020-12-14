@@ -7,6 +7,7 @@ public class Constants {
 	public static final int MAX_TOURS_PER_SHOPPING_CART = 20;
 	public static final String ACCOUNT_ACTIONS_HISTORY = "ACCOUNT_ACTIONS_HISTORY";
 	public static final int MAX_TOURS_PER_HTML_PAGE = 12;
+	public static final int ORDERS_PER_PAGE = 5;
 	public static final String COUNTRY_LIST = "COUNTRY_LIST";
 	public static final String CITY_LIST = "CITY_LIST";
 	public static final String CURRENT_ACCOUNT = "CURRENT_ACCOUNT";

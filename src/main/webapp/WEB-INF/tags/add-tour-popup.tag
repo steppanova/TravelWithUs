@@ -10,7 +10,7 @@
 			<div class="modal-body row">
 				<div class="col-xs-12 col-sm-6">
 					<div class="thumbnail">
-						<img class="product-image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Product image">
+						<img class="tour-image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Tour image">
 					</div>
 				</div>
 				<div class="col-xs-12 col-sm-6">

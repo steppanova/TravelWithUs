@@ -9,13 +9,9 @@ import com.stepanova.travelWithUs.model.CurrentAccount;
 import com.stepanova.travelWithUs.model.ShoppingCart;
 
 public class SessionUtils {
+	
 	public static ShoppingCart getCurrentShoppingCart(HttpServletRequest req) {
-		ShoppingCart shoppingCart = (ShoppingCart) req.getSession().getAttribute(Constants.CURRENT_SHOPPING_CART);
-		if (shoppingCart == null) {
-			shoppingCart = new ShoppingCart();
-			setCurrentShoppingCart(req, shoppingCart);
-		}
-		return shoppingCart;
+		return (ShoppingCart) req.getSession().getAttribute(Constants.CURRENT_SHOPPING_CART);
 	}
 
 	public static boolean isCurrentShoppingCartCreated(HttpServletRequest req) {
@@ -39,6 +35,7 @@ public class SessionUtils {
 		WebUtils.setCookie(Constants.Cookie.SHOPPING_CART.getName(), cookieValue,
 				Constants.Cookie.SHOPPING_CART.getTtl(), resp);
 	}
+
 	public static CurrentAccount getCurrentAccount(HttpServletRequest req) {
 		return (CurrentAccount) req.getSession().getAttribute(Constants.CURRENT_ACCOUNT);
 	}

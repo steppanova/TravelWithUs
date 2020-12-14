@@ -26,6 +26,7 @@ public final class WebUtils {
 		c.setHttpOnly(true);
 		resp.addCookie(c);
 	}
+	
 	public static String getCurrentRequestUrl(HttpServletRequest req) {
 		String query = req.getQueryString();
 		if (query == null) {
@@ -34,6 +35,7 @@ public final class WebUtils {
 			return req.getRequestURI() + "?" + query;
 		}
 	}
+
 	private WebUtils() {
 	}
 }

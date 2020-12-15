@@ -22,11 +22,9 @@
 				<a data-toggle="collapse" href="#searchOptions">More filters <span class="caret"></span></a>
 			</div>
 		</div>
-		<div id="searchOptions" class="collapse">
 			<div id="searchOptions" class="collapse ${searchForm.countriesNotEmpty or searchForm.citiesNotEmpty ? 'in' : '' }">
 			<travelWithUs:country-filter countries="${COUNTRY_LIST }" searchForm="${searchForm}" />
 			<travelWithUs:city-filter cities="${CITY_LIST }"  searchForm="${searchForm}" />
-		</div>
 		</div>
 	</div>
 </form>

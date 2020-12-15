@@ -118,9 +118,9 @@ public class OrdersServiceImpl implements OrdersService {
 			throw new InternalServerErrorException("shoppingCart is null or empty");
 		}
 		try (Connection c = dataSource.getConnection()) {
-			Orders order = JDBCUtils.insert(c, "INSERT INTO orders(id_account,created) values(?,?,?)", ordersResultSetHandler, 
+			Orders order = JDBCUtils.insert(c, "INSERT INTO orders(id_account,created) values(?,?)", ordersResultSetHandler, 
 					currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
-			JDBCUtils.insertBatch(c, "insert into orders_item (id_orders,id_tour,count) values(?,?,?,?)", 
+			JDBCUtils.insertBatch(c, "insert into orders_item (id_orders,id_tour,count) values(?,?,?)", 
 					toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
 			c.commit();
 			return order.getId();

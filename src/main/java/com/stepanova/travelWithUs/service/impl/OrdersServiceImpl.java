@@ -128,10 +128,10 @@ public class OrdersServiceImpl implements OrdersService {
 			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
 		}
 	}
-	private List<Object[]> toOrderItemParameterList(long idOrders, Collection<ShoppingCartItem> items) {
+	private List<Object[]> toOrderItemParameterList(long idOrder, Collection<ShoppingCartItem> items) {
 		List<Object[]> parametersList = new ArrayList<>();
 		for (ShoppingCartItem item : items) {
-			parametersList.add(new Object[] { idOrders, item.getTour().getId(), item.getCount() });
+			parametersList.add(new Object[] { idOrder, item.getTour().getId(), item.getCount() });
 		}
 		return parametersList;
 	}

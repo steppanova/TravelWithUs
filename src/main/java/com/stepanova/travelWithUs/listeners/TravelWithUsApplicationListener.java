@@ -2,12 +2,13 @@ package com.stepanova.travelWithUs.listeners;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.stepanova.travelWithUs.Constants;
 import com.stepanova.travelWithUs.service.impl.ServiceManager;
 
+@WebListener
 public class TravelWithUsApplicationListener implements ServletContextListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TravelWithUsApplicationListener.class);
 	private ServiceManager serviceManager;
@@ -19,15 +20,15 @@ public class TravelWithUsApplicationListener implements ServletContextListener {
 			sce.getServletContext().setAttribute(Constants.COUNTRY_LIST, serviceManager.getTourService().listAllCountries());
 			sce.getServletContext().setAttribute(Constants.CITY_LIST, serviceManager.getTourService().listAllCities());
 		} catch (RuntimeException e) {
-			LOGGER.error("Web application 'ishop' init failed: "+e.getMessage(), e);
+			LOGGER.error("Web application 'travelWithUs' init failed: "+e.getMessage(), e);
 			throw e;
 		}
-		LOGGER.info("Web application 'ishop' initialized");
+		LOGGER.info("Web application 'travelWithUs' initialized");
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		serviceManager.close();
-		LOGGER.info("Web application 'ishop' destroyed");
+		LOGGER.info("Web application 'travelWithUs' destroyed");
 	}
 }

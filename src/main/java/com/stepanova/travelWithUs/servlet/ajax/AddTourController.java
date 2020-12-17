@@ -12,7 +12,8 @@ import com.stepanova.travelWithUs.util.SessionUtils;
 
 @WebServlet("/ajax/json/tour/add")
 public class AddTourController extends AbstractTourController{
-	private static final long serialVersionUID = -3440773010973766553L;
+	
+	private static final long serialVersionUID = 4967078900132751364L;
 
 	@Override
 	protected void processTourForm(TourForm form, ShoppingCart shoppingCart, HttpServletRequest req, HttpServletResponse resp) 

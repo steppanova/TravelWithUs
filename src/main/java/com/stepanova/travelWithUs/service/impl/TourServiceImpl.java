@@ -60,7 +60,7 @@ class TourServiceImpl implements TourService {
 	@Override
 	public List<Country> listAllCountries() {
 		try (Connection c = dataSource.getConnection()) {
-			return JDBCUtils.select(c, "select * from country order by id", countryListResultSetHandler);
+			return JDBCUtils.select(c, "select * FROM country order by id", countryListResultSetHandler);
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
@@ -69,7 +69,7 @@ class TourServiceImpl implements TourService {
 	@Override
 	public List<City> listAllCities() {
 		try (Connection c = dataSource.getConnection()) {
-			return JDBCUtils.select(c, "select * from city order by name", cityListResultSetHandler);
+			return JDBCUtils.select(c, "select * FROM city order by name", cityListResultSetHandler);
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}
@@ -97,7 +97,7 @@ class TourServiceImpl implements TourService {
 	public List<Tour> listToursBySearchForm(SearchForm form, int page, int limit) {
 		try (Connection c = dataSource.getConnection()) {
 			int offset = (page - 1) * limit;
-			SearchQuery sq = buildSearchQuery(" t.*, c.name as country, ci.name as city", form);
+			SearchQuery sq = buildSearchQuery("t.*, c.name as country, ci.name as city", form);
 			sq.getSql().append(" order by t.id limit ? offset ?");
 			sq.getParams().add(limit);
 			sq.getParams().add(offset);

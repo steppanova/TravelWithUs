@@ -15,7 +15,6 @@ import com.stepanova.travelWithUs.util.RoutingUtils;
 
 @WebServlet("/tours/*")
 public class ToursByCountryController extends AbstractController {
-	
 	private static final long serialVersionUID = 7628481811908537001L;
 	private static final int SUBSTRING_INDEX = "/tours".length();
 

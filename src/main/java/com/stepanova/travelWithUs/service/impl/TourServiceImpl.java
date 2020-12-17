@@ -87,7 +87,7 @@ class TourServiceImpl implements TourService {
 	@Override
 	public int countToursByCountry(String countryUrl) {
 		try (Connection c = dataSource.getConnection()) {
-			return JDBCUtils.select(c, "select count(t.*) from tour t, country c where c.id=t.id_country and c.url=?", countResultSetHandler, countryUrl);
+			return JDBCUtils.select(c, "select count(*) from tour t, country c where c.id=t.id_country and c.url=?", countResultSetHandler, countryUrl);
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute sql query: " + e.getMessage(), e);
 		}

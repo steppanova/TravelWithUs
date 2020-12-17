@@ -34,7 +34,8 @@
 	<div class="panel-heading">Tour catalog</div>
 	<div class="list-group">
 		<c:forEach var="country" items="${COUNTRY_LIST }">
-			<a href="/tours${country.url }" class="list-group-item ${selectedCountryUrl == country.url ? 'active' : '' }"> 
+			<a href="/tours${country.url }"
+			 class="list-group-item ${selectedCountryUrl == country.url ? 'active' : '' }"> 
 				<span class="badge">${country.tourCount}</span> ${country.name}
 			</a>
 		</c:forEach>

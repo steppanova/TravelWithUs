@@ -43,7 +43,7 @@ public class Orders extends AbstractEntity<Long>{
 		BigDecimal cost = BigDecimal.ZERO;
 		if (items != null) {
 			for (OrdersItem item : items) {
-				cost = cost.add(item.getTour().getPrice().multiply(BigDecimal.valueOf(item.getCount())));
+				cost = cost.add(item.getTour().getPrice().multiply(BigDecimal.valueOf(item.getCounts())));
 			}
 		}
 		return cost;

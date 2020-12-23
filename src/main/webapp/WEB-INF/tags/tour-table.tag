@@ -21,13 +21,13 @@
 			<tr id="tour${item.tour.id }" class="item">
 				<td class="text-center"><img class="smal" src="/media/${item.tour.imageLink }" alt="${item.tour.name }"><br>${item.tour.name }</td>
 				<td class="price">$ ${item.tour.price }</td>
-				<td class="count">${item.count }</td>
+				<td class="count">${item.counts }</td>
 				<c:if test="${showActionColumn }">
 				<td class="hidden-print">
 				<c:choose>
-				<c:when test="${item.count > 1 }">
+				<c:when test="${item.counts > 1 }">
 					<a class="btn btn-danger remove-tour" data-id-tour="${item.tour.id }" data-count="1">Remove one</a><br><br>
-					<a class="btn btn-danger remove-tour remove-all" data-id-tour="${item.tour.id }" data-count="${item.count }">Remove all</a>
+					<a class="btn btn-danger remove-tour remove-all" data-id-tour="${item.tour.id }" data-count="${item.counts }">Remove all</a>
 				</c:when>
 				<c:otherwise>
 					<a class="btn btn-danger remove-tour" data-id-tour="${item.tour.id }" data-count="1">Remove one</a>

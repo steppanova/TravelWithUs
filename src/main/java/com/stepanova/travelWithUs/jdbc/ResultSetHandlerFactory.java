@@ -70,9 +70,9 @@ public final class ResultSetHandlerFactory {
 		public OrdersItem handle(ResultSet rs) throws SQLException {
 			OrdersItem ordersItem = new OrdersItem();
 			ordersItem.setId(rs.getLong("id"));
-			ordersItem.setCount(rs.getInt("count"));
 			ordersItem.setIdOrders(rs.getLong("id_orders"));
 			Tour t = TOUR_RESULT_SET_HANDLER.handle(rs);
+			ordersItem.setCounts(rs.getInt("counts"));
 			ordersItem.setTour(t);
 			return ordersItem;
 		}
@@ -83,20 +83,27 @@ public final class ResultSetHandlerFactory {
 		public Orders handle(ResultSet rs) throws SQLException {
 			Orders o = new Orders();
 			o.setId(rs.getLong("id"));
-			o.setCreated(rs.getTimestamp("created"));
 			o.setIdAccount(rs.getInt("id_account"));
+			o.setCreated(rs.getTimestamp("created"));
 			return o;
 		}
 	};
+
+	public static ResultSetHandler<Integer> getIdResultSetHandler() {
+		return new ResultSetHandler<Integer>() {
+			@Override
+			public Integer handle(ResultSet rs) throws SQLException {
+				rs.next();
+				return rs.getInt(1);
+			}
+		};
+	}
 	public static ResultSetHandler<Integer> getCountResultSetHandler() {
 		return new ResultSetHandler<Integer>() {
 			@Override
 			public Integer handle(ResultSet rs) throws SQLException {
-				if (rs.next()) {
-					return rs.getInt(1);
-				} else {
-					return 0;
-				}
+				rs.next();
+				return rs.getInt(1);
 			}
 		};
 	}

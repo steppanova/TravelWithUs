@@ -5,12 +5,12 @@ public class OrdersItem extends AbstractEntity<Long>{
 	private static final long serialVersionUID = 7747357513465108086L;
 	private Long idOrders;
 	private Tour tour;
-	private int count;
+	private int counts;
 
-	public OrdersItem(Tour tour, int count) {
+	public OrdersItem(Tour tour, int counts) {
 		super();
 		this.tour = tour;
-		this.count = count;
+		this.counts = counts;
 	}
 
 	public OrdersItem() {
@@ -33,16 +33,16 @@ public class OrdersItem extends AbstractEntity<Long>{
 		this.tour = tour;
 	}
 
-	public int getCount() {
-		return count;
+	public int getCounts() {
+		return counts;
 	}
 
-	public void setCount(int count) {
-		this.count = count;
+	public void setCounts(int counts) {
+		this.counts = counts;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("OrdersItem [id=%s, idOrders=%s, tour=%s, count=%s]", getId(), idOrders, tour, count);
+		return String.format("OrdersItem [id=%s, idOrders=%s, tour=%s, counts=%s]", getId(), idOrders, tour, counts);
 	}
 }

@@ -21,7 +21,7 @@
 		<div class="price">$ ${t.price } <c:if test="${t.hotTour eq 0}"><img class="small" src="/media/fire.png" alt="Fire"></c:if></div>
 		<a class="btn btn-primary pull-right buy-btn" data-id-tour="${t.id }">Buy</a><div class="list-group">
 	<span class="list-group-item"> <small>Person:</small> <span class="person">${t.person }</span></span>
-	<span class="list-group-item"> <small>Duration:</small><span class="country">${t.duration }</span></span>
+	<span class="list-group-item"> <small>Duration:</small><span class="duration">${t.duration }</span></span>
 	<span class="list-group-item"> <small>Country:</small><span class="country">${t.country }</span></span>
     <span class="list-group-item"> <small>City:</small> <span class="city">${t.city }</span></span>
 					</div>

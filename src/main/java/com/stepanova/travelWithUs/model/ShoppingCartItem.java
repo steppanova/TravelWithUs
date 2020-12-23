@@ -8,14 +8,14 @@ public class ShoppingCartItem implements Serializable {
 
 	private static final long serialVersionUID = 4796570150616495535L;
 	private Tour tour;
-	private int count;
+	private int counts;
 	public ShoppingCartItem() {
 		super();
 	}
-	public ShoppingCartItem(Tour tour, int count) {
+	public ShoppingCartItem(Tour tour, int counts) {
 		super();
 		this.tour = tour;
-		this.count = count;
+		this.counts = counts;
 	}
 	public Tour getTour() {
 		return tour;
@@ -23,14 +23,14 @@ public class ShoppingCartItem implements Serializable {
 	public void setTour(Tour tour) {
 		this.tour = tour;
 	}
-	public int getCount() {
-		return count;
+	public int getCounts() {
+		return counts;
 	}
-	public void setCount(int count) {
-		this.count = count;
+	public void setCounts(int counts) {
+		this.counts = counts;
 	}
 	@Override
 	public String toString() {
-		return String.format("ShoppingCartItem [tour=%s, count=%s]", tour, count);
+		return String.format("ShoppingCartItem [tour=%s, counts=%s]", tour, counts);
 	}
 }

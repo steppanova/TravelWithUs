@@ -42,7 +42,7 @@ public abstract class AbstractTourController extends AbstractController {
 
 	protected void sendResponse(ShoppingCart shoppingCart, HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		JSONObject cardStatistics = new JSONObject();
-		cardStatistics.put("totalCount", shoppingCart.getTotalCount());
+		cardStatistics.put("totalCount", shoppingCart.getTotalCounts());
 		cardStatistics.put("totalCost", shoppingCart.getTotalCost());
 		RoutingUtils.sendJSON(cardStatistics, req, resp);
 	}

@@ -43,6 +43,8 @@ public class OrdersServiceImpl implements OrdersService {
 			ResultSetHandlerFactory.getListResultSetHandler(ResultSetHandlerFactory.ORDERS_RESULT_SET_HANDLER);
 	private final ResultSetHandler<Integer> countResultSetHandler = 
 			ResultSetHandlerFactory.getCountResultSetHandler();
+	private final ResultSetHandler<Integer> idResultSetHandler = 
+			ResultSetHandlerFactory.getIdResultSetHandler();
 
 	
 	public OrdersServiceImpl(DataSource dataSource) {
@@ -72,7 +74,7 @@ public class OrdersServiceImpl implements OrdersService {
 	public String serializeShoppingCart(ShoppingCart shoppingCart) {
 		StringBuilder res = new StringBuilder();
 		for (ShoppingCartItem item : shoppingCart.getItems()) {
-			res.append(item.getTour().getId()).append("-").append(item.getCount()).append("|");
+			res.append(item.getTour().getId()).append("-").append(item.getCounts()).append("|");
 		}
 		if (res.length() > 0) {
 			res.deleteCharAt(res.length() - 1);
@@ -118,12 +120,13 @@ public class OrdersServiceImpl implements OrdersService {
 			throw new InternalServerErrorException("shoppingCart is null or empty");
 		}
 		try (Connection c = dataSource.getConnection()) {
-			Orders order = JDBCUtils.insert(c, "INSERT INTO orders(id_account,created) values(?,?)", ordersResultSetHandler, 
-					currentAccount.getId(), new Timestamp(System.currentTimeMillis()));
-			JDBCUtils.insertBatch(c, "insert into orders_item (id_orders,id_tour,count) values(?,?,?)", 
-					toOrderItemParameterList(order.getId(), shoppingCart.getItems()));
+			JDBCUtils.insert(c, "INSERT INTO orders (id_account,created) values(?,?)", ordersResultSetHandler, 
+					currentAccount.getId(), new Timestamp(System.currentTimeMillis()));	
+			int idOrder = JDBCUtils.select(c, "SELECT MAX(id) FROM orders ", idResultSetHandler);
+			JDBCUtils.insertBatch(c, "INSERT INTO orders_item (id_orders,id_tour,counts) values(?,?,?)", 
+					toOrderItemParameterList(idOrder, shoppingCart.getItems()));
 			c.commit();
-			return order.getId();
+			return idOrder;
 		} catch (SQLException e) {
 			throw new InternalServerErrorException("Can't execute SQL request: " + e.getMessage(), e);
 		}
@@ -131,7 +134,7 @@ public class OrdersServiceImpl implements OrdersService {
 	private List<Object[]> toOrderItemParameterList(long idOrder, Collection<ShoppingCartItem> items) {
 		List<Object[]> parametersList = new ArrayList<>();
 		for (ShoppingCartItem item : items) {
-			parametersList.add(new Object[] { idOrder, item.getTour().getId(), item.getCount() });
+			parametersList.add(new Object[] { idOrder, item.getTour().getId(), item.getCounts() });
 		}
 		return parametersList;
 	}
@@ -146,7 +149,7 @@ public class OrdersServiceImpl implements OrdersService {
 				throw new AccessDeniedException("Account with id=" + currentAccount.getId() + " is not owner for order with id=" + id);
 			}
 			List<OrdersItem> list = JDBCUtils.select(c,
-					"select o.id as id, o.id_orders as id_orders, o.id_tour, o.count, t.*, c.name as country, ci.name as city from orders_item o, tour t, country c, city ci "
+					"select o.id as id, o.id_orders as id_orders, o.id_tour, o.counts, t.*, c.name as country, ci.name as city from orders_item o, tour t, country c, city ci "
 							+ "where ci.id=t.id_city and c.id=t.id_country and o.id_tour=t.id and o.id_orders=?",
 					ordersItemListResultSetHandler, id);
 			order.setItems(list);

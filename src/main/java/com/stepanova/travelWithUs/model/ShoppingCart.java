@@ -13,28 +13,28 @@ public class ShoppingCart implements Serializable {
 	
 	private static final long serialVersionUID = -7182154007024202473L;
 	private Map<Integer, ShoppingCartItem> tours = new LinkedHashMap<>();
-	private int totalCount = 0;
+	private int totalCounts = 0;
 	private BigDecimal totalCost = BigDecimal.ZERO;
 
-	public void addTour(Tour tour, int count) {
+	public void addTour(Tour tour, int counts) {
 		validateShoppingCartSize(tour.getId());
 		ShoppingCartItem shoppingCartItem = tours.get(tour.getId());
 		if (shoppingCartItem == null) {
-			validateTourCount(count);
-			shoppingCartItem = new ShoppingCartItem(tour, count);
+			validateTourCount(counts);
+			shoppingCartItem = new ShoppingCartItem(tour, counts);
 			tours.put(tour.getId(), shoppingCartItem);
 		} else {
-			validateTourCount(count + shoppingCartItem.getCount());
-			shoppingCartItem.setCount(shoppingCartItem.getCount() + count);
+			validateTourCount(counts + shoppingCartItem.getCounts());
+			shoppingCartItem.setCounts(shoppingCartItem.getCounts() + counts);
 		}
 		refreshStatistics();
 	}
 
-	public void removeTour(Integer idTour, int count) {
+	public void removeTour(Integer idTour, int counts) {
 		ShoppingCartItem shoppingCartItem = tours.get(idTour);
 		if (shoppingCartItem != null) {
-			if (shoppingCartItem.getCount() > count) {
-				shoppingCartItem.setCount(shoppingCartItem.getCount() - count);
+			if (shoppingCartItem.getCounts() > counts) {
+				shoppingCartItem.setCounts(shoppingCartItem.getCounts() - counts);
 			} else {
 				tours.remove(idTour);
 			}
@@ -46,17 +46,17 @@ public class ShoppingCart implements Serializable {
 		return tours.values();
 	}
 
-	public int getTotalCount() {
-		return totalCount;
+	public int getTotalCounts() {
+		return totalCounts;
 	}
 	
 	public BigDecimal getTotalCost() {
 		return totalCost;
 	}
 	
-	private void validateTourCount(int count) {
-		if(count > Constants.MAX_TOUR_COUNT_PER_SHOPPING_CART){
-			throw new ValidationException("Limit for tour count reached: count="+count);
+	private void validateTourCount(int counts) {
+		if(counts > Constants.MAX_TOUR_COUNT_PER_SHOPPING_CART){
+			throw new ValidationException("Limit for tour count reached: count="+counts);
 		}
 	}
 	
@@ -68,18 +68,19 @@ public class ShoppingCart implements Serializable {
 	}
 
 	private void refreshStatistics() {
-		totalCount = 0;
+		totalCounts = 0;
 		totalCost = BigDecimal.ZERO;
 		for (ShoppingCartItem shoppingCartItem : getItems()) {
-			totalCount += shoppingCartItem.getCount();
-			totalCost = totalCost.add(shoppingCartItem.getTour().getPrice().multiply(BigDecimal.valueOf(shoppingCartItem.getCount())));
+			totalCounts += shoppingCartItem.getCounts();
+			totalCost = totalCost.add(shoppingCartItem.getTour().getPrice().multiply(BigDecimal.valueOf(shoppingCartItem.getCounts())));
 		}
 	}
 
 	@Override
 	public String toString() {
-		return String.format("ShoppingCart [tours=%s, totalCount=%s, totalCost=%s]", tours, totalCount, totalCost);
+		return String.format("ShoppingCart [tours=%s, totalCounts=%s, totalCost=%s]", tours, totalCounts, totalCost);
 	}
+
 
 
 }
